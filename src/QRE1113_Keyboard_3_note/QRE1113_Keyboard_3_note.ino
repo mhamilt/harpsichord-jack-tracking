@@ -24,8 +24,10 @@ unsigned long sensorHomeValues[3] = { 0, 0, 0 };
 const int sensorPins[3] = { A2, A1, A0 };
 int sensorValues[3] = { 0, 0, 0 };
 int prevValues[3] = { 0, 0, 0 };
-byte pluckValues[3] = { 235, 160, 225 };
+byte pluckValues[3] = { 150, 80, 90 };
 byte releaseValues[3] = { 24, 24, 24 };
+unsigned long currentTime[3]  = { 0, 0, 0 };
+unsigned long previousTime[3] = { 0, 0, 0 };
 JackState jackStates[3];
 JackState prevStates[3];
 
@@ -149,25 +151,25 @@ void printReadings() {
 void checkJackStates() {
   bool anyTrigger = false;
   if (jackStates[0] == PLUCK and prevStates[0] == RELEASED) {
-    noteOn(1, 70, 127);
+    noteOn(0, 70, 127);
     anyTrigger = true;
   }
   if (jackStates[1] == PLUCK and prevStates[1] == RELEASED) {
-    noteOn(1, 67, 127);
+    noteOn(0, 67, 127);
     anyTrigger = true;
   }
   if (jackStates[2] == PLUCK and prevStates[2] == RELEASED) {
-    noteOn(1, 64, 127);
+    noteOn(0, 64, 127);
     anyTrigger = true;
   }
   if (jackStates[0] == RELEASED and prevStates[0] != RELEASED) {
-    noteOff(1, 70, 127);
+    noteOff(0, 70, 127);
   }
   if (jackStates[1] == RELEASED and prevStates[1] != RELEASED) {
-    noteOff(1, 67, 127);
+    noteOff(0, 67, 127);
   }
   if (jackStates[2] == RELEASED and prevStates[2] != RELEASED) {
-    noteOff(1, 64, 127);
+    noteOff(0, 64, 127);
   }
 
 
@@ -212,5 +214,12 @@ void controlChange(byte channel, byte control, byte value) {
 }
 
 //-----------------------------------------------------------------------------
-
+byte getVelocity()
+{
+  // value before
+  // value after
+  // millis in between
+  millis();
+  return 0;
+}
 //-----------------------------------------------------------------------------
