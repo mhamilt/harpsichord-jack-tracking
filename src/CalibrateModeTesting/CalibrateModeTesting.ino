@@ -27,36 +27,38 @@ int sensorValues[3] = { 0, 0, 0 };
 void setup() {
   Serial.begin(9600);
   analogReference(AR_INTERNAL1V65);
-  
   readPluckFromEEPROM();
+  calibrate();
 
   if (b.isPressed()) {
+    Serial.println("DEBUG MODE");
     executeDebugMode = true;
-    // setup for roatry and leds
+    r.setChangedHandler(rotate);
+    b.setDoubleClickHandler(doubleclick);
+    b.setClickHandler(click);
+
+    for (auto pin : ledPins) {
+      pinMode(pin, OUTPUT);
+      digitalWrite(pin, LOW);
+    }
+    digitalWrite(ledPins[r.getPosition()], HIGH);
     // enter debug mode loop
     // on long press, exit debug mode and write pluck values to memory
-    while (true) {
+    while (executeDebugMode) {
+      r.loop();
+      b.loop();
+      updateSensorReadings();
+      printReadings();
     }
     writePluckToEEPROM();
+    for (auto pin : ledPins) {
+      pinMode(pin, OUTPUT);
+      digitalWrite(pin, LOW);
+    }
   }
-
-
-  r.setChangedHandler(rotate);
-  b.setDoubleClickHandler(click);
-  b.setLongClickHandler(longclick);
-
-  for (auto pin : ledPins) {
-    pinMode(pin, OUTPUT);
-    digitalWrite(pin, LOW);
-  }
-  digitalWrite(ledPins[r.getPosition()], HIGH);
-  calibrate();
 }
 
 void loop() {
-  r.loop();
-  b.loop();
-
   updateSensorReadings();
   printReadings();
 }
@@ -81,13 +83,12 @@ void exitDebug() {
   executeDebugMode = false;
 }
 
-void longclick(Button2& btn) {
+void doubleclick(Button2& btn) {
   exitDebug();
 }
 
 
 void rotate(Rotary& r) {
-
   if (isKeySelectMode) {
 
     curKey = r.getPosition();
