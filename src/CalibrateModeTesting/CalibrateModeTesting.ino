@@ -2,6 +2,7 @@
 #include <Button2.h>
 #include <FlashStorage_SAMD.h>
 //-----------------------------------------------------------------------------
+// Rotary Variables
 const byte BUTTON_PIN = 10;
 const byte ROTARY_PIN1 = 11;
 const byte ROTARY_PIN2 = 12;
@@ -17,12 +18,18 @@ byte curKey = 0;
 bool isKeySelectMode = true;
 bool executeDebugMode = false;
 //-----------------------------------------------------------------------------
+// Sensor variables
 const int sensorPins[3] = { A2, A1, A0 };
-
 byte pluckValues[3] = { 158, 57, 61 };
 unsigned long sensorHomeValues[3] = { 0, 0, 0 };
 int sensorValues[3] = { 0, 0, 0 };
 
+//-----------------------------------------------------------------------------
+// EEPROM Vars
+const uint16_t tagAddress = 0;
+const char tagName[4] = { 'D', 'A', 'T', 'A' };
+const uint16_t pluckValAddress = tagAddress + 4;
+//-----------------------------------------------------------------------------
 
 void setup() {
   Serial.begin(9600);
@@ -31,26 +38,14 @@ void setup() {
   calibrate();
 
   if (b.isPressed()) {
-    Serial.println("DEBUG MODE");
-    executeDebugMode = true;
-    r.setChangedHandler(rotate);
-    b.setDoubleClickHandler(doubleclick);
-    b.setClickHandler(click);
 
-    for (auto pin : ledPins) {
-      pinMode(pin, OUTPUT);
-      digitalWrite(pin, LOW);
-    }
-    digitalWrite(ledPins[r.getPosition()], HIGH);
-    // enter debug mode loop
-    // on long press, exit debug mode and write pluck values to memory
-    while (executeDebugMode) {
-      r.loop();
-      b.loop();
-      updateSensorReadings();
-      printReadings();
-    }
+    setupDebugMode();
+
+    while (executeDebugMode)
+      debugModeLoop();
+
     writePluckToEEPROM();
+
     for (auto pin : ledPins) {
       pinMode(pin, OUTPUT);
       digitalWrite(pin, LOW);
@@ -77,6 +72,27 @@ void click(Button2& btn) {
     r.setLowerBound(0);
     r.resetPosition(pluckValues[curKey], false);
   }
+}
+
+void setupDebugMode() {
+  Serial.println("DEBUG MODE");
+  executeDebugMode = true;
+  r.setChangedHandler(rotate);
+  b.setDoubleClickHandler(doubleclick);
+  b.setClickHandler(click);
+
+  for (auto pin : ledPins) {
+    pinMode(pin, OUTPUT);
+    digitalWrite(pin, LOW);
+  }
+  digitalWrite(ledPins[r.getPosition()], HIGH);
+}
+
+void debugModeLoop() {
+  r.loop();
+  b.loop();
+  updateSensorReadings();
+  printReadings();
 }
 
 void exitDebug() {
@@ -178,27 +194,33 @@ void updateSensorReadings() {
   sensorValues[2] = (sensorValues[2] < 0) ? 0 : sensorValues[2];
 }
 
+//-----------------------------------------------------------------------------
+// EEPROM Functions
 
+/// Read Data from EEPROM if the DATA tag is present in memory. If not, this
+/// must be a first in which case use the default values for pluckValues and
+/// write that to memory.
 void readPluckFromEEPROM() {
-  uint16_t address = 0;
-  int number;
-  EEPROM.get(address, number);
-  EEPROM.get(address + 0, pluckValues[0]);
-  EEPROM.get(address + 1, pluckValues[1]);
-  EEPROM.get(address + 2, pluckValues[2]);
+
+  uint32_t tagRead;
+  EEPROM.get<uint32_t>(tagAddress, tagRead);
+
+  if (tagRead != *((uint32_t*)tagName)) {
+    EEPROM.put<char[4]>(tagAddress, tagName);
+    EEPROM.put<byte[3]>(pluckValAddress, pluckValues);
+
+    if (!EEPROM.getCommitASAP())
+      EEPROM.commit();
+
+  } else {
+    EEPROM.get<byte[3]>(pluckValAddress, pluckValues);
+  }
 }
 
 void writePluckToEEPROM() {
 
-  uint16_t address = 0;
+  EEPROM.put<byte[3]>(pluckValAddress, pluckValues);
 
-  EEPROM.put(address + 0, pluckValues[0]);
-  EEPROM.put(address + 1, pluckValues[1]);
-  EEPROM.put(address + 2, pluckValues[2]);
-
-
-  if (!EEPROM.getCommitASAP()) {
-    Serial.println("CommitASAP not set. Need commit()");
+  if (!EEPROM.getCommitASAP())
     EEPROM.commit();
-  }
 }

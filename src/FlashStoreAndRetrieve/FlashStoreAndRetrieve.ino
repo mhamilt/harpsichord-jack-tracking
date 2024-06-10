@@ -28,10 +28,13 @@ byte curKey = 0;
 bool isKeySelectMode = true;
 bool newData = true;
 byte valToWrite = 0;
+const uint16_t tagAddress = 0;
+const char tagName[4] = { 'D', 'A', 'T', 'A' };
+const uint16_t valueAddress = tagAddress + 4;
 //-----------------------------------------------------------------------------
 
 void setup() {
-  Serial.begin(115200);
+  Serial.begin(9600);
   while (!Serial) {}
 
   delay(200);
@@ -43,33 +46,58 @@ void setup() {
   Serial.print("EEPROM length: ");
   Serial.println(EEPROM.length());
 
-  r.setChangedHandler(rotate);
-  b.setLongClickHandler(longclick);
-  b.setDoubleClickHandler(doubleclick);
+  uint32_t tagRead;
+  EEPROM.get<uint32_t>(tagAddress, tagRead);
+  
+  char* printTag = (char*)&tagRead;
+  Serial.print(printTag[0]);
+  Serial.print(printTag[1]);
+  Serial.print(printTag[2]);
+  Serial.println(printTag[3]);
+
+  Serial.print(tagName[0]);
+  Serial.print(tagName[1]);
+  Serial.print(tagName[2]);
+  Serial.println(tagName[3]);
+
+  if (tagRead != *((uint32_t*)tagName)) {
+    Serial.print("DATA Tag not Found");
+    EEPROM.put<char[4]>(tagAddress, tagName);
+
+
+    if (!EEPROM.getCommitASAP()) {
+      Serial.println("CommitASAP not set. Need commit()");
+      EEPROM.commit();
+    }
+  }
+
+  // r.setChangedHandler(rotate);
+  // b.setLongClickHandler(longclick);
+  // b.setDoubleClickHandler(doubleclick);
 }
 
 void loop() {
-  r.loop();
-  b.loop();
-  updatePrint();
+  // r.loop();
+  // b.loop();
+  // updatePrint();
 }
 
 //-----------------------------------------------------------------------------
 void rotate(Rotary& r) {
   valToWrite = r.getPosition();
-  Serial.print(r.getPosition());  
+  Serial.print(r.getPosition());
 }
 
 void doubleclick(Button2& btn) {
-  uint16_t address = 0;
+
   byte number0;
   byte number1;
   byte number2;
 
   // Read the content of emulated-EEPROM
-  EEPROM.get(address + 0, number0);
-  EEPROM.get(address + 1, number1);
-  EEPROM.get(address + 2, number2);
+  EEPROM.get(valueAddress + 0, number0);
+  EEPROM.get(valueAddress + 1, number1);
+  EEPROM.get(valueAddress + 2, number2);
 
   // Print the current number on the serial monitor
   Serial.print("\nNumbers: ");
@@ -81,11 +109,11 @@ void doubleclick(Button2& btn) {
 }
 
 void longclick(Button2& btn) {
-  uint16_t address = 0;
 
-  EEPROM.put(address + 0, valToWrite);
-  EEPROM.put(address + 1, valToWrite);
-  EEPROM.put(address + 2, valToWrite);
+
+  EEPROM.put(valueAddress + 0, valToWrite);
+  EEPROM.put(valueAddress + 1, valToWrite);
+  EEPROM.put(valueAddress + 2, valToWrite);
 
   if (!EEPROM.getCommitASAP()) {
     Serial.println("CommitASAP not set. Need commit()");
@@ -100,15 +128,15 @@ void updatePrint() {
   if (newData) {
     newData = false;
 
-    uint16_t address = 0;
+
     byte number0;
     byte number1;
     byte number2;
 
     // Read the content of emulated-EEPROM
-    EEPROM.get(address + 0, number0);
-    EEPROM.get(address + 1, number1);
-    EEPROM.get(address + 2, number2);
+    EEPROM.get(valueAddress + 0, number0);
+    EEPROM.get(valueAddress + 1, number1);
+    EEPROM.get(valueAddress + 2, number2);
 
     // Print the current number on the serial monitor
     Serial.print("Numbers: ");
@@ -121,15 +149,15 @@ void updatePrint() {
 }
 
 void printData() {
-  uint16_t address = 0;
+
   byte number0;
   byte number1;
   byte number2;
 
   // Read the content of emulated-EEPROM
-  EEPROM.get(address + 0, number0);
-  EEPROM.get(address + 1, number1);
-  EEPROM.get(address + 2, number2);
+  EEPROM.get(valueAddress + 0, number0);
+  EEPROM.get(valueAddress + 1, number1);
+  EEPROM.get(valueAddress + 2, number2);
 
   // Print the current number on the serial monitor
   Serial.print("\nNumbers: ");
