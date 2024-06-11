@@ -1,3 +1,14 @@
+/*
+  Testing of Calibration (Debug) Mode for Jack Sensors
+
+  Holding down the button of the rotary encoder on startup will enter debug mode.
+  From here you can select which pluck threshold to modify by turning the rotary encoder then pressing the button
+  
+  A double click will exit debug mode and wrirte the new thresholds to the EEPROM.
+
+  If the EEPROM has never been written to before, the default pluckValues will be written and used.
+
+ */
 #include <Rotary.h>
 #include <Button2.h>
 #include <FlashStorage_SAMD.h>
@@ -57,22 +68,8 @@ void loop() {
   updateSensorReadings();
   printReadings();
 }
-
 //-----------------------------------------------------------------------------
-// Rotary Callbacks
-
-void click(Button2& btn) {
-  isKeySelectMode = !isKeySelectMode;
-  if (isKeySelectMode) {
-    r.setUpperBound(2);
-    r.setLowerBound(0);
-    r.resetPosition(curKey, false);
-  } else {
-    r.setUpperBound(255);
-    r.setLowerBound(0);
-    r.resetPosition(pluckValues[curKey], false);
-  }
-}
+// Debug functions
 
 void setupDebugMode() {
   Serial.println("DEBUG MODE");
@@ -98,6 +95,24 @@ void debugModeLoop() {
 void exitDebug() {
   executeDebugMode = false;
 }
+
+
+//-----------------------------------------------------------------------------
+// Rotary Callbacks
+
+void click(Button2& btn) {
+  isKeySelectMode = !isKeySelectMode;
+  if (isKeySelectMode) {
+    r.setUpperBound(2);
+    r.setLowerBound(0);
+    r.resetPosition(curKey, false);
+  } else {
+    r.setUpperBound(255);
+    r.setLowerBound(0);
+    r.resetPosition(pluckValues[curKey], false);
+  }
+}
+
 
 void doubleclick(Button2& btn) {
   exitDebug();
