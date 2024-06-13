@@ -7,9 +7,39 @@ void printJackStates() {
       Serial.print(i);
       Serial.print(" Plucked ");
       anyPrint = true;
-      digitalWrite(ledPins[i],HIGH);
+      digitalWrite(ledPins[i], HIGH);
     }
   }
+
+// OR
+  // {
+  //   int i = 5;
+
+  //   if (jackStates[i] != prevStates[i]) {
+
+  //     switch (jackStates[i]) {
+  //       case PLUCKED:
+  //         Serial.print("Jack 5 PLUCKED");
+  //         break;
+  //       case PLUCK:
+  //         Serial.print("Jack 5 PLUCK");
+  //         break;
+  //       case PRESSING:
+  //         Serial.print("Jack 5 PRESSING");
+  //         break;
+  //       case RELEASING:
+  //         Serial.print("Jack 5 RELEASING");
+  //         break;
+  //       case RELEASED:
+  //         Serial.print("Jack 5 RELEASED");
+  //         break;
+  //       case UNKNOWN_KEY_STATE:
+  //         Serial.print("Jack 5 UNKNOWN_KEY_STATE");
+  //         break;
+  //     }      
+  //     anyPrint = true;
+  //   }
+  // }
 
   if (anyPrint)
     Serial.println();

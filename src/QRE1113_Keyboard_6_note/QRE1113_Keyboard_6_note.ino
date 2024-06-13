@@ -1,6 +1,47 @@
 /*
-  QRE1113  3-Note Keyboard
+  QRE1113  6-Note Keyboard
   
+  Firmware for 3-key, 6-jack Harpsochord model
+
+
+  Wiring:
+  
+    |   Connection   | Pin |
+    | -------------- | --- |
+    | Jack 0 QRE1113 | A0  |
+    | Jack 1 QRE1113 | A1  |
+    | Jack 2 QRE1113 | A2  |
+    | Jack 3 QRE1113 | A3  |
+    | Jack 4 QRE1113 | A6  |
+    | Jack 5 QRE1113 | A7  |
+    | Jack 0 LED     | D2  |
+    | Jack 1 LED     | D3  |
+    | Jack 2 LED     | D4  |
+    | Jack 3 LED     | D5  |
+    | Jack 4 LED     | D6  |
+    | Jack 5 LED     | D7  |
+    | Rotary CLK     | D12 |
+    | Rotary DATA    | D11 |
+    | Rotary Switch  | D10 |
+
+
+  Jack Layout:
+
+    ┌─┐┌─┐┌─┐
+    ┤3│┤4│┤5│
+    └─┘└─┘└─┘
+    ┌─┐┌─┐┌─┐
+    │0├│1├│2├
+    └─┘└─┘└─┘
+
+    ┌──┬─┬──┐
+    │  │ │  │
+    │  │ │  │
+    │  │ │  │
+    │  └┬┘  │
+    │   │   │
+    │   │   │
+    └───┴───┘
 */
 //-----------------------------------------------------------------------------
 #include <MIDIUSB.h>
@@ -26,14 +67,13 @@ unsigned long sensorHomeValues[numSensors];
 const pin_size_t sensorPins[numSensors] = { A0, A1, A2, A3, A6, A7 };
 const byte ledPins[numSensors] = { 3, 5, 7, 2, 4, 6 };
 const bool ledFeedback = true;
-int sensorValues[numSensors];
-int prevValues[numSensors];
-byte pluckValues[numSensors] = { 65, 80, 180, 80, 77, 20 };
+int sensorValues[numSensors] = { 0, 0, 0, 0, 0, 0 };
+int prevValues[numSensors] = { 0, 0, 0, 0, 0, 0 };
+byte noteMap[numSensors] = { 70, 71, 72, 70, 71, 72 };
+byte pluckValues[numSensors] = { 65, 80, 180, 80, 77, 36 };
 byte releaseValues[numSensors] = { 24, 24, 24, 24, 24, 24 };
-unsigned long currentTime[numSensors];
-unsigned long previousTime[numSensors];
-JackState jackStates[numSensors] = { RELEASED };
-JackState prevStates[numSensors] = { RELEASED };
+JackState jackStates[numSensors] = { RELEASED, RELEASED, RELEASED, RELEASED, RELEASED, RELEASED };
+JackState prevStates[numSensors] = { RELEASED, RELEASED, RELEASED, RELEASED, RELEASED, RELEASED };
 //-----------------------------------------------------------------------------
 // Rotary Variables
 const byte BUTTON_PIN = 10;
