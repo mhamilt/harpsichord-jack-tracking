@@ -2,8 +2,8 @@
 
 This repository collects together all materials (CAD Drawings, diagrams, firmware source code) related to Harpsichord Jack Tracking Project at the NEMUS project.
 
-| ![ ](img/side_w-o_sensors.jpeg)                             |
-| ----------------------------------------------------------- |
+|               ![ ](img/side_w-o_sensors.jpeg)               |
+| :---------------------------------------------------------: |
 | Side View of the model harpsichord used during development. |
 
 - [Harpsichord Jack Tracking](#harpsichord-jack-tracking)
@@ -51,15 +51,15 @@ Give a rough pitch of `14.2375 mm` with an offset of  `33.5 mm` from the front e
 
 ### Diagram
 
-| ![ ](img/cross_section_invert.png)                |
-| ------------------------------------------------- |
+|        ![ ](img/cross_section_invert.png)         |
+| :-----------------------------------------------: |
 | Cross-section of full sized harpsichord interface |
 
 
 ## QRE1113 Notes
 
-| ![ ](img/top_down_w_nano.jpg)                               |
-| ----------------------------------------------------------- |
+|                ![ ](img/top_down_w_nano.jpg)                |
+| :---------------------------------------------------------: |
 | Model keyboard and QRE1113s attached to Arduino Nano 33 IoT |
 
 
@@ -72,8 +72,8 @@ QRE1113s are used with alongside adhesive strips with a black and white gradient
 The optimal distance between the strip and the sensor is around 6mm with a voltage reference of [`1.65V` provided by Arduino SAMD boards](https://www.arduino.cc/reference/en/language/functions/analog-io/analogreference/)
 
 | ![ ](img/jacks_w_strip_sensor_internal.jpg) |
-| ------------------------------------------- |
-| Jacks with gradient strip attached          |
+| :-----------------------------------------: |
+|     Jacks with gradient strip attached      |
 
 
 ### Data sheets
