@@ -58,7 +58,7 @@ Give a rough pitch of `14.2375 mm` with an offset of  `33.5 mm` from the front e
 
 ## QRE1113 Notes
 
-|                ![ ](img/top_down_w_nano.jpg)                |
+|       <img src="img/top_down_w_nano.jpg" width="50%">       |
 | :---------------------------------------------------------: |
 | Model keyboard and QRE1113s attached to Arduino Nano 33 IoT |
 
