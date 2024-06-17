@@ -10,6 +10,16 @@
 #include <FlashStorage_SAMD.h>
 //-----------------------------------------------------------------------------
 
+enum MIDI_EVENT_STATUS {
+  NOTE_OFF = 0x8,
+  NOTE_ON = 0x9,
+  POLY_AFTERTOUCH = 0xA,
+  CONTROL_CHANGE = 0xB,
+  PROGRAM_CHANGE = 0xC,
+  AFTERTOUCH = 0xD,
+  PITCH_WHEEL = 0xE,
+};
+
 enum JackState {
   PLUCKED,
   PLUCK,
