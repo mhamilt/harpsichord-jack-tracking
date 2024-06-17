@@ -120,10 +120,10 @@ example:
 **NOTE:** There is a secondary use case where the controller is used with a digital instrument that expects a standard MPE signal. In that case there _may_ be problem. However, it is not guaranteed to not work. Behavior in this case is undefined.
 
 The same is true of the plug-in, which will be written to expect the above format of note messages.
-As a result, the plug-in will need two modes of operation. A standard MPE for using with a standard MPE keyboard requiring a single note on/note off per key. The econd mode designed spewcifially for the harpsichord keyboard interface. This gives control of the excitation of both of the strings.
+As a result, the plug-in will need two modes of operation. A standard MPE for using with a standard MPE keyboard requiring a single note on/note off per key. The second mode designed specifically for the harpsichord keyboard interface. This gives control of the excitation of both of the strings.
 
 
 ### Aftertouch
 
-Channel Polyphonic Key Pressure is one stream, taken from the front jack tracking signal.
+Channel Pressure (MIDI Status event nybble `0xD`) is sent as one stream, taken from the front jack tracking signal.
 
