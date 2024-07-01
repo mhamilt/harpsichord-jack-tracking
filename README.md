@@ -47,7 +47,15 @@ Give a rough pitch of `14.2375 mm` with an offset of  `33.5 mm` from the front e
 
 ### Full Scale Keyboard 
 
+|    ![ ](img/49-key-top.jpeg)    |
+| :-----------------------------: |
+| Top view of the 49-key keyboard |
+
+The full scale version of the interface has 49 keys and 2 jack rows. The jacks are generally around `4.65 mm`.
+
 ###  Jack Pitch
+
+There is not much variation in the pitch of the jacks. On average the centre-to-centre is `14.15 mm`. Likely error between jacks would compound across the full length. This should be compensated for by the separate pcbs which have groups of 7 sensors.
 
 ### Diagram
 
