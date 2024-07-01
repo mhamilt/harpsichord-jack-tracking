@@ -57,6 +57,9 @@ The full scale version of the interface has 49 keys and 2 jack rows. The jacks a
 
 There is not much variation in the pitch of the jacks. On average the centre-to-centre is `14.15 mm`. Likely error between jacks would compound across the full length. This should be compensated for by the separate pcbs which have groups of 7 sensors.
 
+Space between the jacks is `9.75 mm`, meaning central pcbs will have to have less than half this distance (`4.875mm`) in order to slot together.
+
+
 ### Diagram
 
 |        ![ ](img/cross_section_invert.png)         |
