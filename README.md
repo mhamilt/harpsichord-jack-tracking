@@ -12,6 +12,7 @@ This repository collects together all materials (CAD Drawings, diagrams, firmwar
     - [Jack Pitch](#jack-pitch)
     - [Full Scale Keyboard](#full-scale-keyboard)
     - [Jack Pitch](#jack-pitch-1)
+    - [PCB](#pcb)
     - [Diagram](#diagram)
   - [QRE1113 Notes](#qre1113-notes)
     - [Functionality](#functionality)
@@ -59,6 +60,9 @@ There is not much variation in the pitch of the jacks. On average the centre-to-
 
 Space between the jacks is `9.75 mm`, meaning central pcbs will have to have less than half this distance (`4.875mm`) in order to slot together.
 
+### PCB
+
+With a pitch of `14.02 mm` a theoretical limit to the width of a 7-sensor PCB would be `98.2 mm`, but with margin required from traces this is not possible. The upper limit is `112.22 mm` but with variation during fabrication it is unwise to push the tolerance to the nearest `1/10 mm`. A `1.5 mm` tolerance brings the limit to about `99.7 mm` to `110.7 mm`
 
 ### Diagram
 
