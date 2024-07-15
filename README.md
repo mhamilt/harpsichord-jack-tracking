@@ -12,6 +12,7 @@ This repository collects together all materials (CAD Drawings, diagrams, firmwar
     - [Jack Pitch](#jack-pitch)
     - [Full Scale Keyboard](#full-scale-keyboard)
     - [Jack Pitch](#jack-pitch-1)
+    - [Jack Travel](#jack-travel)
     - [PCB](#pcb)
     - [Diagram](#diagram)
   - [QRE1113 Notes](#qre1113-notes)
@@ -59,6 +60,10 @@ The full scale version of the interface has 49 keys and 2 jack rows. The jacks a
 There is not much variation in the pitch of the jacks. On average the centre-to-centre is `14.02 mm`. Likely error between jacks would compound across the full length. This should be compensated for by the separate pcbs which have groups of 7 sensors.
 
 Space between the jacks is `9.75 mm`, meaning central pcbs will have to have less than half this distance (`4.875mm`) in order to slot together.
+
+###  Jack Travel
+
+Front jacks have a travel of about `8.5mm` and back jacks `9.0mm` between key release and full key press.
 
 ### PCB
 
