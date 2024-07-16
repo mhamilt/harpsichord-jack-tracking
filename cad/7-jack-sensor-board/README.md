@@ -2,7 +2,7 @@
 
 This word was an intermediate to try out the new spacing for the full scale model
 
-Pins for an Arduino Nano ar icluded directly on the board.
+Pins for an Arduino Nano are included directly on the board.
 
 ## Wiring
 
