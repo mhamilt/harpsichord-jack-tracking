@@ -14,10 +14,16 @@ This repository collects together all materials (CAD Drawings, diagrams, firmwar
     - [Jack Pitch](#jack-pitch-1)
     - [Jack Travel](#jack-travel)
     - [PCB](#pcb)
+      - [7 Sensor Face Board](#7-sensor-face-board)
+        - [Eagle commands](#eagle-commands)
+    - [Gradient Tag](#gradient-tag)
     - [Diagram](#diagram)
   - [QRE1113 Notes](#qre1113-notes)
+    - [Spacing](#spacing)
     - [Functionality](#functionality)
     - [Data sheets](#data-sheets)
+    - [Multiplexing](#multiplexing)
+      - [1. Using 2 Micro contorllers](#1-using-2-micro-contorllers)
   - [MIDI Specifications](#midi-specifications)
     - [Jack Differentiation](#jack-differentiation)
     - [Aftertouch](#aftertouch)
@@ -63,11 +69,79 @@ Space between the jacks is `9.75 mm`, meaning central pcbs will have to have les
 
 ###  Jack Travel
 
-Front jacks have a travel of about `8.5mm` and back jacks `9.0mm` between key release and full key press.
+The jacks have a height of `91.65mm`. Front jacks have a travel of about `8.5mm` and back jacks `9.0mm` between key release and full key press.
 
 ### PCB
 
 With a pitch of `14.02 mm` a theoretical limit to the width of a 7-sensor PCB would be `98.2 mm`, but with margin required from traces this is not possible. The upper limit is `112.22 mm` but with variation during fabrication it is unwise to push the tolerance to the nearest `1/10 mm`. A `1.5 mm` tolerance brings the limit to about `99.7 mm` to `110.7 mm`
+
+#### 7 Sensor Face Board
+
+Face boards mount the QRE1113s perpendicular to the board so that there is no need to bend the through hole mounting legs during assembly.
+
+There are a couple of designs, at at present what is most important is the hole mounts at (`18.00mm`, `10.00mm`) and (`18.00mm`, `81.40mm`)
+
+
+
+```py
+ox = 1.71     # min distance from board edge
+pitch = 14.02 # jack pitch
+[(x * pitch) + ox for x in range(0,7)]
+[1.71, 15.73, 29.75, 43.77, 57.79, 71.80999999999999, 85.83]
+```
+
+##### Eagle commands
+
+Python can be used to automatically generate the placement of all pieces.
+
+```py
+qrepitch = 1.8 # placement is calculated from the 
+ox = 1.71     # min distance from board edge
+oy = 3.51 # min distance from board edge in y axis
+pitch = 14.02 # jack pitch
+
+for index, point in enumerate([(x * pitch) + ox for x in range(0,7)]):
+  print(f"move Q{index+1} (3.51 {point});")
+
+max_board_width = (6*pitch) + ox + qrepitch + ox
+  
+
+for index, point in enumerate([(x * 12) + 7 for x in range(0,7)]):
+  print(f"move R{(index+1)*2} (10 {point});")
+
+for index, point in enumerate([(x * 12.9) + 7 for x in range(0,7)]):
+  print(f"move R{(index*2)+1} (7 {point});")
+  print(f"move R{(index+1)*2} (10 {point});")
+
+for index, point in enumerate([(x * 12.6) + 7 for x in range(0,7)]):
+  print(f"move LED{(index+1)} (34 {point});")
+
+for index, point in enumerate([(x * 12.) + 7 for x in range(0,7)]):
+  print(f"rotate LED{(index+1)};")
+
+for index, point in enumerate([(x * 12.6) + 7 for x in range(0,7)]):
+  print(f"rotate R{(index+15)};")
+  print(f"move R{(index+15)} (30 {point});")
+
+for index, point in enumerate([(x * 2.6) + 41 for x in range(0,7)]):  
+  print(f"move R{(index+15)} (18 {point});")
+
+for index, point in enumerate([(x * 12.6) + 7 for x in range(0,7)]):
+  print(f"rotate R{(index+15)};")
+
+for index, point in enumerate([(x * 12.6) + 7 for x in range(0,7)]):
+  print(f"mirror R{(index+15)};")
+
+for index, point in enumerate([(x * 12.) + 7 for x in range(0,7)]):
+  print(f"mirror LED{(index+1)};")
+
+```
+
+### Gradient Tag
+
+The QRE1113 reflects from a tag with a gradient printed.
+
+The should be `40 mm` in length to avoid potential catching on the jack hole. The active area of the gradient need only be the length of the [jack travel](#jack-travel)
 
 ### Diagram
 
@@ -84,6 +158,16 @@ With a pitch of `14.02 mm` a theoretical limit to the width of a 7-sensor PCB wo
 
 
 Displacement of the jacks is measure using QRE1113 IR LED / Transistor pair. The section covers some general observations and helpful information about these sensors.
+
+### Spacing
+
+Distance between pins is `1.8mm` meaning the space from the centre is `0.9mm`. CAD placement should offset by `0.9mm` to compensate.
+
+|                 |         |
+| --------------- | ------- |
+| short leg pitch | `1.80mm` |
+| long leg pitch  | `3.80mm` |
+
 
 ### Functionality
 
@@ -103,6 +187,45 @@ The optimal distance between the strip and the sensor is around 6mm with a volta
 | <img width="496" alt="image" src="https://github.com/mhamilt/harpsichord-model-data/assets/33174176/ae605c5e-47d4-40e9-a4b1-86a8f60ec120"> | <img width="394" alt="image" src="https://github.com/mhamilt/harpsichord-model-data/assets/33174176/14ffb907-1013-4fd9-bb91-761ac52bf176"> |
 | :----------------------------------------------------------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------------------------------------------------------: |
 |                     QRE1113 Dimension. Not that pin 1 should always have a chamfer on the corner to help identify it.                      |                                                               QRE1113 Pinout                                                               |
+
+### Multiplexing
+
+- 14 Boards
+- 7 sensors each
+- 7 analog channels
+- 8 channel multiplexer
+
+
+- BLE Nano
+  - 8 ADC channels A0 - A7
+  - For 8 ADC channels an 8-channel multiplexer will allow for 8 boards to address 8 sensors.
+
+Solutions:
+
+1. Use 2 micro controllers, one for front, one for back
+  - each a separate MIDI device
+2. cascade front and back
+  1. two groups of transistors
+      - 16 transistors
+        - 2 sets of 7 for signals
+        - 2 extra for interfacing with the others
+      - 2 extra digital pins used
+  2. another bank of multiplexers
+      - 7 multiplexers for groups of seven boards
+      - 3 more digital pins for control 
+
+#### 1. Using 2 Micro contorllers
+
+- Each sensor board needs 8 pins
+  1. VCC
+  2. Signal
+  3. Addr1: A
+  4. Addr2: B
+  5. Addr3: C
+  6. Interrupt
+  7. GND
+  8. VEE
+- 
 
 
 ## MIDI Specifications
