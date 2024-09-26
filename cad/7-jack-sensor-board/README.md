@@ -25,3 +25,20 @@ Pins for an Arduino Nano are included directly on the board.
 | Rotary CLK     | D12 |
 | Rotary DATA    | D11 |
 | Rotary Switch  | D10 |
+
+## PCB
+
+### Eagle Libraries
+
+- https://github.com/cyberlink1/Arduino-Eagle-Cad-Library
+
+### Logo
+
+[Imagemagick](https://imagemagick.org) was use to quantise the nemus logo to a 1-bit bitmap for the silkscreen
+
+```sh
+magick logo.png logo.bmp
+magick logo.bmp -resize 8x8% logo.bmp
+magick logo.bmp -monochrome logo.bmp
+magick -flop -flip logo.bmp logo_b.bmp # for the bottom layer, the image is reversed
+```
