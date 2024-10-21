@@ -57,7 +57,7 @@ Give a rough pitch of `14.2375 mm` with an offset of  `33.5 mm` from the front e
 
 |    ![ ](img/49-key-top.jpeg)    |
 | :-----------------------------: |
-| Top view of the 49-key keyboard |
+| Top view of the 49-key keyboard |ll
 
 The full scale version of the interface has 49 keys and 2 jack rows. The jacks are generally around `4.65 mm`.
 
@@ -95,23 +95,31 @@ pitch = 14.02 # jack pitch
 Python can be used to automatically generate the placement of all pieces.
 
 ```py
-qrepitch = 1.8 # placement is calculated from the 
+qrepitch = 1.8 # placement is calculated from the #1 pin, pitch is used to offset to the centre
 ox = 1.71     # min distance from board edge
-oy = 3.51 # min distance from board edge in y axis
+oy = 1.71 # min distance from board edge in y axis
 pitch = 14.02 # jack pitch
+max_board_width = (6*pitch) + ox + qrepitch + ox
 
 for index, point in enumerate([(x * pitch) + ox for x in range(0,7)]):
-  print(f"move Q{index+1} (3.51 {point});")
+  print(f"move Q{index+1} ({oy} {point});")
+  # print(f"rotate Q{index+1};")
+for index, point in enumerate([(x * pitch) + ox for x in range(0,16)]):
+  print(f"move Q{index+1} ({oy} {point});")
 
-max_board_width = (6*pitch) + ox + qrepitch + ox
-  
+resitor10k_ox = 10.1 # min distance from board edge in y axis
+resitor10k_oy = 7.0 # min distance from board edge in y axis
+resitor100_ox = 7.5 # min distance from board edge in y axis
+resitor100_oy = 7.0 # min distance from board edge in y axis
+rpitch = 12.9
 
-for index, point in enumerate([(x * 12) + 7 for x in range(0,7)]):
-  print(f"move R{(index+1)*2} (10 {point});")
-
-for index, point in enumerate([(x * 12.9) + 7 for x in range(0,7)]):
-  print(f"move R{(index*2)+1} (7 {point});")
-  print(f"move R{(index+1)*2} (10 {point});")
+for index, point in enumerate([(x * rpitch) + resitor100_oy for x in range(0,16)]):
+  if index < 7:
+    print(f"move R{(index*2)+1} ({resitor100_ox} {point});")
+    print(f"move R{(index+1)*2} ({resitor10k_ox} {point});")
+  if index >= 7:
+    print(f"move R{((index+1)*2)+1} ({resitor100_ox} {point});")
+    print(f"move R{((index+1)+1)*2} ({resitor10k_ox} {point});")
 
 for index, point in enumerate([(x * 12.6) + 7 for x in range(0,7)]):
   print(f"move LED{(index+1)} (34 {point});")
@@ -119,11 +127,14 @@ for index, point in enumerate([(x * 12.6) + 7 for x in range(0,7)]):
 for index, point in enumerate([(x * 12.) + 7 for x in range(0,7)]):
   print(f"rotate LED{(index+1)};")
 
+for index, point in enumerate([(x * 12.6) + 7 for x in range(17,34)]):
+  print(f"rotate R{(index+17)};")
+
 for index, point in enumerate([(x * 12.6) + 7 for x in range(0,7)]):
   print(f"rotate R{(index+15)};")
   print(f"move R{(index+15)} (30 {point});")
 
-for index, point in enumerate([(x * 2.6) + 41 for x in range(0,7)]):  
+for index, point in enumerate([(x * 2.6) + 41 for x in range(0,16)]):  
   print(f"move R{(index+15)} (18 {point});")
 
 for index, point in enumerate([(x * 12.6) + 7 for x in range(0,7)]):
@@ -135,6 +146,30 @@ for index, point in enumerate([(x * 12.6) + 7 for x in range(0,7)]):
 for index, point in enumerate([(x * 12.) + 7 for x in range(0,7)]):
   print(f"mirror LED{(index+1)};")
 
+led_ox = 33 # min distance from board edge in y axis
+led_oy = 9 # min distance from board edge in y axis
+
+for index, point in enumerate([(x * 12.) + led_ox for x in range(0,7)]):
+  print(f"rotate D{(index+1)};")
+  print(f"rotate D{(index+1)};")
+
+for index, point in enumerate([(x * 12.) + led_ox for x in range(0,7)]):
+  print(f"rotate D{(index+1)};")
+  print(f"move D{(index+1)} ({led_ox} {point});")
+  print(f"mirror D{(index+1)};")
+
+for index, point in enumerate([(x * 13) + led_oy for x in range(0,16)]):
+  print(f"move D{(index+1)} ({led_ox} {point});")
+
+
+for index, point in enumerate([(x * 12.) + led_ox for x in range(0,16)]):
+  print(f"rotate D{(index+7)};")
+  print(f"move D{(index+7)} ({led_ox} {point});")
+  print(f"mirror D{(index+7)};")
+
+for index, point in enumerate([(x * 12.) + led_oy for x in range(0,7)]):  
+  print(f"move D{(index+1)} ({led_ox} {point});")
+  
 ```
 
 ### Gradient Tag
