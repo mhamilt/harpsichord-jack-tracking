@@ -40,5 +40,5 @@ void printJackThreshold(byte index)
   Serial.print("Thresh");
   Serial.print(index);
   Serial.print(":");
-  Serial.print(sensorThreshold[index]);
+  Serial.print(pluckThresholds[index]);
 }
