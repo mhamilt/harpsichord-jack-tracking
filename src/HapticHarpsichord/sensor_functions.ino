@@ -22,6 +22,7 @@ void readSensors() {
   }
 }
 
+//-----------------------------------------------------------------------------
 /// Read a single sensor and return its raw value
 int readSensor(byte index) {
   int adc = index / numPcbs;
@@ -35,20 +36,26 @@ int readSensor(byte index) {
   return analogRead(A0 + adc);
 }
 
+
+//-----------------------------------------------------------------------------
 void calibrateSensors() {
   setThresholdsFromEEPROM();
-  // readSensors();
+  readSensors();
   setAverages();
 }
 
+//-----------------------------------------------------------------------------
 
 void setThresholdsFromEEPROM() {
 
 }
 
+//-----------------------------------------------------------------------------
+
 void setAverages() {
 }
 
+//-----------------------------------------------------------------------------
 
 byte getOnVelocity(int j) {
 
@@ -71,6 +78,8 @@ byte getOnVelocity(int j) {
     }
   }
 }
+
+//-----------------------------------------------------------------------------
 
 byte getOffVelocity(int j) {
   byte velocity;

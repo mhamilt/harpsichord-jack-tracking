@@ -61,6 +61,16 @@
 // Local Headers
 #include "error_codes.h"
 //-----------------------------------------------------------------------------
+// Enums
+enum JackState {
+  PLUCKED,
+  PLUCK,
+  PRESSING,
+  RELEASING,
+  RELEASED,
+  UNKNOWN_KEY_STATE
+};
+//-----------------------------------------------------------------------------
 #define numSensors 49
 #define numMuxChannels 7
 #define numPcbs 7
@@ -92,8 +102,16 @@ uint32_t* tempPointer;
 uint32_t sensorAvgMaxima[numSensors];
 uint32_t sensorAvgMinima[numSensors];
 uint32_t pluckThresholds[numSensors];
+uint32_t releaseThresholds[numSensors];
 uint32_t readCount = 0;
 uint64_t lastRead = 0;
+//-----------------------------------------------------------------------------
+// Jack States
+JackState jackStatesA[numSensors];
+JackState jackStatesB[numSensors];
+JackState* jackStates = jackStatesA;
+JackState* prevStates = jackStatesB;
+JackState* tempStatePointer;
 //-----------------------------------------------------------------------------
 // LED Variables
 const size_t ledPin = 9;
@@ -164,8 +182,9 @@ void loop() {
     Serial.println(now - lastRead);
     lastRead = now;
   }
+  
+  updateJackStates();
   setLedsToJackDisplacement();
-  // updateJackStates();
   // printReadings();
   // checkJackStates();
   // // printJackStates();
