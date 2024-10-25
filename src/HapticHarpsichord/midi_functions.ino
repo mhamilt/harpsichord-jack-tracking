@@ -13,3 +13,4 @@ void controlChange(byte channel, byte control, byte value) {
 void aftertouch(byte channel, byte key, byte pressure) {
   MidiUSB.write(MIDIMessage::PolyphonicAftertouch(key, pressure, channel));
 }
+

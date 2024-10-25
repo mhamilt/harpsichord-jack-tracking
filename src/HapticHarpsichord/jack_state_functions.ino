@@ -1,3 +1,8 @@
+byte index2note(byte index, byte transpose = 0)
+{
+  return index + 36 + transpose;
+}
+
 void updateJackStates() {
 
   tempStatePointer = prevStates;
@@ -22,29 +27,17 @@ void updateJackStates() {
 }
 
 void checkJackStates() {
-  bool anyTrigger = false;
-  if (jackStates[0] == PLUCK and prevStates[0] == RELEASED) {
-    noteOn(0, 70, 127);
-    anyTrigger = true;
-  }
-  if (jackStates[1] == PLUCK and prevStates[1] == RELEASED) {
-    noteOn(0, 67, 127);
-    anyTrigger = true;
-  }
-  if (jackStates[2] == PLUCK and prevStates[2] == RELEASED) {
-    noteOn(0, 64, 127);
-    anyTrigger = true;
-  }
-  if (jackStates[0] == RELEASED and prevStates[0] != RELEASED) {
-    noteOff(0, 70, 127);
-  }
-  if (jackStates[1] == RELEASED and prevStates[1] != RELEASED) {
-    noteOff(0, 67, 127);
-  }
-  if (jackStates[2] == RELEASED and prevStates[2] != RELEASED) {
-    noteOff(0, 64, 127);
-  }
 
+  bool anyTrigger = false;
+  for (int i = 0; i < numSensors; i++) {
+    if (jackStates[i] == PLUCK and prevStates[i] == RELEASED) {
+      byte velocity = getOnVelocity(i);
+      noteOn(0, index2note(i), velocity);
+    } else if (jackStates[i] == RELEASED and prevStates[i] != RELEASED) {
+      byte velocity = abs(prevSensorReadings[i] - currSensorReadings[i]);      
+      noteOff(0, index2note(i), velocity);    
+    }
+  }
 
   if (anyTrigger)
     ;
