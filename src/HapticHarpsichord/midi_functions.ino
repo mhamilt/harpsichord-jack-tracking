@@ -14,3 +14,7 @@ void aftertouch(byte channel, byte key, byte pressure) {
   MidiUSB.write(MIDIMessage::PolyphonicAftertouch(key, pressure, channel));
 }
 
+byte index2note(byte index, byte transpose)
+{
+  return numSensors - 1 - index + 36 + transpose;
+}

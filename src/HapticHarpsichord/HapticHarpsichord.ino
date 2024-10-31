@@ -7,7 +7,7 @@
 
   | Connection      | Pin   |
   | --------------- | ----- |
-  | EEPROM SPI CLK  | D13   |
+  | NC              | D13   |
   | EEPROM VCC      | 3.3v  |
   | AREF POT Switch | AREF  |
   | PCB 0 QRE1113   | A0    |
@@ -31,7 +31,7 @@
   | Mux C           | D8      |
   | Mux B           | D7      |
   | Mux A           | D6      |
-  | Mux Interrupt   | D5      |
+  | EEPROM SPI CLK  | D5      |
   | EEPROM SPI MISO | D4      |
   | EEPROM SPI MOSI | D3      |
   | EEPROM SPI CS   | D2      |
@@ -61,6 +61,8 @@
 // Local Headers
 #include "error_codes.h"
 //-----------------------------------------------------------------------------
+#define ALWAYS_DEBUG true
+//-----------------------------------------------------------------------------
 // Enums
 enum JackState {
   PLUCKED,
@@ -79,13 +81,16 @@ enum JackState {
 #error "Check product of mux channels and number of PCBs is equal to total number of sensors"
 #endif
 //-----------------------------------------------------------------------------
+constexpr byte key2index(byte k);
+byte index2note(byte index, byte transpose = 0);
+//-----------------------------------------------------------------------------
 // Config Variables
-const unsigned long midiBaudRate = 31250;
+const unsigned long midiBaudRate = 115200;  // 31250;
 bool executeDebugMode = false;
 //-----------------------------------------------------------------------------
 // Operation Mode Variables
 bool isKeySelectMode = true;
-uint8_t curKey = 0;
+uint8_t curKeyIndex = key2index(25);
 //-----------------------------------------------------------------------------
 // Multiplexer Variables
 const size_t muxPinA = 6;
@@ -94,15 +99,15 @@ const size_t muxPinC = 8;
 // const size_t muxPinD = 9;
 //-----------------------------------------------------------------------------
 // Sensor variables
-uint32_t sensorReadingsA[numSensors];
-uint32_t sensorReadingsB[numSensors];
-uint32_t* prevSensorReadings = sensorReadingsA;
-uint32_t* currSensorReadings = sensorReadingsA;
-uint32_t* tempPointer;
-uint32_t sensorAvgMaxima[numSensors];
-uint32_t sensorAvgMinima[numSensors];
-uint32_t pluckThresholds[numSensors];
-uint32_t releaseThresholds[numSensors];
+uint16_t sensorReadingsA[numSensors];
+uint16_t sensorReadingsB[numSensors];
+uint16_t* prevSensorReadings = sensorReadingsB;
+uint16_t* currSensorReadings = sensorReadingsA;
+uint16_t* tempPointer;
+uint16_t sensorAvgMaxima[numSensors];
+uint16_t sensorAvgMinima[numSensors];
+uint16_t pluckThresholds[numSensors];
+uint16_t releaseThresholds[numSensors];
 uint32_t readCount = 0;
 uint64_t lastRead = 0;
 //-----------------------------------------------------------------------------
@@ -118,34 +123,39 @@ const size_t ledPin = 9;
 Adafruit_NeoPixel leds(numSensors, ledPin, NEO_GRB + NEO_KHZ800);
 //-----------------------------------------------------------------------------
 // Rotary Variables
-const byte BUTTON_PIN = 10;
-const byte ROTARY_PIN1 = 11;
-const byte ROTARY_PIN2 = 12;
+const byte ROTARY_PINC = 12;
+const byte ROTARY_PINA = 10;
+const byte ROTARY_PINB = 11;
 const byte CLICKS_PER_STEP = 4;
 const byte MIN_POS = 0;
-const byte MAX_POS = 2;
+const uint16_t MAX_POS = numSensors - 1;
 const byte START_POS = 0;
 const byte INCREMENT = 1;
-Rotary rotary = Rotary(ROTARY_PIN1, ROTARY_PIN2, CLICKS_PER_STEP, MIN_POS, MAX_POS, START_POS, INCREMENT);
-Button2 button = Button2(BUTTON_PIN);
+Rotary rotary = Rotary(ROTARY_PINA, ROTARY_PINB, CLICKS_PER_STEP, MIN_POS, MAX_POS, START_POS, INCREMENT);
+Button2 button = Button2(ROTARY_PINC);
 //-----------------------------------------------------------------------------
 // EEPROM Variables
-uint8_t FRAM_CS = 13;
-uint8_t FRAM_MISO = 4;
-uint8_t FRAM_MOSI = 3;
-uint8_t FRAM_SCK = 2;
+const uint8_t FRAM_CS = 2;
+const uint8_t FRAM_MOSI = 3;
+const uint8_t FRAM_MISO = 4;
+const uint8_t FRAM_SCK = 5;
 Adafruit_FRAM_SPI fram = Adafruit_FRAM_SPI(FRAM_SCK, FRAM_MISO, FRAM_MOSI, FRAM_CS);
-const uint32_t tagAddress = 0;
-const uint8_t tagName[4] = { 'D', 'A', 'T', 'A' };
-const uint32_t pluckValAddress = tagAddress + 4;
+const uint8_t addrSizeInBytes = 2;  // Default to address size of two bytes
+const uint16_t tagAddress = 0;
+const uint8_t thresholdTag[4] = { 'D', 'A', 'T', 'A' };
+// const uint8_t maxTag[4] = { 'M', 'A', 'X', 'I' };
+// const uint8_t minTag[4] = { 'M', 'I', 'N', 'I' };
+const uint16_t pluckValAddress = tagAddress + 4;
 //-----------------------------------------------------------------------------
 // MIDI Variables
 USBMIDI MidiUSB;
 
 void setup() {
-
   Serial.begin(midiBaudRate);
-
+  // Save some power
+  digitalWrite(PIN_ENABLE_I2C_PULLUP, LOW);
+  digitalWrite(PIN_ENABLE_SENSORS_3V3, LOW);
+  // digitalWrite(LED_PWR, LOW);
   /// setup mux
   pinMode(muxPinA, OUTPUT);
   pinMode(muxPinB, OUTPUT);
@@ -155,24 +165,34 @@ void setup() {
   pinMode(LEDR, OUTPUT);
   pinMode(LEDG, OUTPUT);
   pinMode(LEDB, OUTPUT);
+
+  digitalWrite(LEDR, HIGH);
+  digitalWrite(LEDG, HIGH);
+  digitalWrite(LEDB, HIGH);
+
+  for (int i = 0; i < numSensors; i++) {
+    sensorAvgMinima[i] = 1024;
+    pluckThresholds[i] = 500;
+  }
+
   leds.begin();
   leds.clear();
-
+  // rainbow(10);
   /// setup EEPROM
   if (!fram.begin())
     halt(FRAM_NOT_FOUND);
 
-  /// calibrarte sensors
-  setOperationMode();
+  readPluckFromEEPROM();
 
-  if (false /*debug mode*/) {
+  /// calibrarte sensors
+  calibrate();
+
+  if (button.isPressed() or ALWAYS_DEBUG) {
     debugLoop();
   }
-  
 }
 
 void loop() {
-
   readSensors();
   readCount++;
 
@@ -182,16 +202,50 @@ void loop() {
     Serial.println(now - lastRead);
     lastRead = now;
   }
-  
+
   updateJackStates();
   setLedsToJackDisplacement();
   // printReadings();
   // checkJackStates();
   // // printJackStates();
+  unsigned long now = millis();
+  static int step = 0;
+  if (millis() - now > 10) {
+    rainbow(step++);
+    now = millis();
+  }
 }
 
+void calibrate() {
 
-/// Set if the device will operate in a standard or debug mode
-void setOperationMode() {
+  static const int numReading = 8;
+
+  for (int i = 0; i < numSensors; i++) {
+    unsigned long runningTotal = 0;
+
+    for (int k = 0; k < numReading; k++) {
+      runningTotal += readSensor(i);
+    }
+    sensorAvgMaxima[i] = runningTotal /= numReading;
+    // leds.setPixelColor(i, leds.Color(0, 0, 100));
+    // leds.show();
+  }
 }
 
+constexpr byte index2key(byte i) {
+  return (numSensors - i);
+}
+
+constexpr byte key2index(byte k) {
+  if (k > numSensors)
+    k = numSensors;
+  else if (k < 1)
+    k = 1;
+  return (numSensors - k);
+}
+
+// Rainbow cycle along whole strip. Pass delay time (in ms) between frames.
+void rainbow(int step) {
+  leds.rainbow(step * 256);
+  leds.show();  // Update strip with new contents
+}

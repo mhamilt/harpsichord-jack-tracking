@@ -1,11 +1,6 @@
 /// Read all sensors and put results in currSensorReadings
 void readSensors() {
 
-  // pointer swap
-  tempPointer = prevSensorReadings;
-  prevSensorReadings = currSensorReadings;
-  currSensorReadings = tempPointer;
-
   for (int mux = 0; mux < numMuxChannels; mux++) {
 
     // switch mux channel
@@ -20,11 +15,15 @@ void readSensors() {
       currSensorReadings[i] = analogRead(A0 + adc);
     }
   }
+  // pointer swap
+  tempPointer = prevSensorReadings;
+  prevSensorReadings = currSensorReadings;
+  currSensorReadings = tempPointer;
 }
 
 //-----------------------------------------------------------------------------
 /// Read a single sensor and return its raw value
-int readSensor(byte index) {
+unsigned int readSensor(byte index) {
   int adc = index / numPcbs;
   int mux = index - adc * numPcbs;
 

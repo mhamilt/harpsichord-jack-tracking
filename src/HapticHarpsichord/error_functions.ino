@@ -19,7 +19,14 @@ void halt(HapticHarpsichordErrorCodes errorCode) {
   switch (errorCode) {
     case FRAM_NOT_FOUND:
       while (true) {
-        blinkRGB(LEDB, 500, 2000, 3);
+        // blinkRGB(LEDB, 500, 2000, 3);
+        for (int i = 0; i < 3; i++) {
+          leds.fill(leds.Color(20, 0, 0), 0, numSensors);
+          delay(500);
+          leds.fill(leds.Color(0, 0, 0), 0, numSensors);
+          delay(500);
+        }
+        delay(3000);
       }
       break;
     default:

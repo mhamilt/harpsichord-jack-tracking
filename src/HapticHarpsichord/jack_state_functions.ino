@@ -1,7 +1,4 @@
-byte index2note(byte index, byte transpose = 0)
-{
-  return index + 36 + transpose;
-}
+
 
 void updateJackStates() {
 
