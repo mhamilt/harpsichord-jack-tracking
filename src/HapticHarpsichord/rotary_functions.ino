@@ -35,9 +35,9 @@ void rotate(Rotary& r) {
   if (isKeySelectMode) {
     curKeyIndex = r.getPosition();
     leds.fill(leds.Color(0, 0, 0), 0, numSensors);
-    leds.setPixelColor(curKeyIndex, 0, 0, 100);
+    leds.setPixelColor(curKeyIndex, 0, 0, 255);
     leds.show();
-    } else {
-  pluckThresholds[curKeyIndex] = r.getPosition();
+  } else {
+    pluckThresholds[curKeyIndex] = r.getPosition();
   }
 }

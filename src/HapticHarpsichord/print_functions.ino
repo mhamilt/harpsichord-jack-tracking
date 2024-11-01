@@ -20,23 +20,23 @@
 //-----------------------------------------------------------------------------
 
 void printJackReading(byte index) {
-  Serial.print("min:");
+  Serial.print("m:");
   Serial.print(0);
   Serial.print(' ');
 
-  Serial.print("max:");
+  Serial.print("M:");
   Serial.print(1024);
   Serial.print(' ');
   
-  Serial.print("keymax:");
+  Serial.print("kM:");
   Serial.print(sensorAvgMaxima[index]);
   Serial.print(' ');
 
-  Serial.print("keymin:");
+  Serial.print("km:");
   Serial.print(sensorAvgMinima[index]);
   Serial.print(' ');
 
-  Serial.print("Jack");
+  Serial.print("K");
   Serial.print(index2key(index));
   Serial.print(":");
   Serial.print(readSensor(index));
@@ -45,7 +45,7 @@ void printJackReading(byte index) {
 
 void printJackThreshold(byte index)
 {
-  Serial.print("Thresh");
+  Serial.print("T");
   Serial.print(index2key(index));
   Serial.print(":");
   Serial.print(pluckThresholds[index]);

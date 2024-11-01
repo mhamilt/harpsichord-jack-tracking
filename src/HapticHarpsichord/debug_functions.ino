@@ -19,17 +19,15 @@ void setupDebugMode() {
 /// run loop for debug mode
 void debugLoop() {
   setupDebugMode();
-  // leds.fill(leds.Color(1, 1, 0), 0, numSensors);
-  // leds.setPixelColor(curKeyIndex, 0, 0, 100);
-  // leds.show();
-
+  
+  curKeyIndex = rotary.getPosition();
+  leds.fill(leds.Color(0, 0, 0), 0, numSensors);
+  leds.setPixelColor(curKeyIndex, 0, 0, 255);
+  leds.show();
 
   unsigned long now = millis();
-  
+
   while (executeDebugMode) {
-
-
-
 
     setCurrentKey();
     rotary.loop();
@@ -39,14 +37,14 @@ void debugLoop() {
     for (int i = 0; i < numSensors; i++) {
       // if (index2key(i) >= 20 and index2key(i) <= 30) {
       if (currSensorReadings[i] < pluckThresholds[i] and prevSensorReadings[i] > pluckThresholds[i]) {
-        noteOff(0, index2note(i), 127);
+        noteOff(0, index2note(i), 100);
         // if (i == curKeyIndex)
         //   leds.setPixelColor(i, 50, 0, 0);
         //   leds.show();
 
       } else if (currSensorReadings[i] > pluckThresholds[i] and prevSensorReadings[i] < pluckThresholds[i]) {
         // leds.setPixelColor(i, 0, 100, 0);
-        noteOn(0, index2note(i), 127);
+        noteOn(0, index2note(i), 100);
         // leds.show();
       }
       // }

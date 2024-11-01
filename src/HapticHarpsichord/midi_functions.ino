@@ -16,5 +16,5 @@ void aftertouch(byte channel, byte key, byte pressure) {
 
 byte index2note(byte index, byte transpose)
 {
-  return numSensors - 1 - index + 36 + transpose;
+  return numSensors - 1 - index + 48 + transpose;
 }
