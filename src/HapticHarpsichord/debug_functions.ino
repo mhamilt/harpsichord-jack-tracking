@@ -19,36 +19,32 @@ void setupDebugMode() {
 /// run loop for debug mode
 void debugLoop() {
   setupDebugMode();
-  
+
   curKeyIndex = rotary.getPosition();
   leds.fill(leds.Color(0, 0, 0), 0, numSensors);
   leds.setPixelColor(curKeyIndex, 0, 0, 255);
   leds.show();
 
-  unsigned long now = millis();
-
   while (executeDebugMode) {
 
-    setCurrentKey();
+    if (millis() - now > 10) {
+      rainbow(step++);
+      now = millis();
+    }
+
+    // setCurrentKey();
+    readSensors();
     rotary.loop();
     button.loop();
-    readSensors();
-
+    
     for (int i = 0; i < numSensors; i++) {
-      // if (index2key(i) >= 20 and index2key(i) <= 30) {
       if (currSensorReadings[i] < pluckThresholds[i] and prevSensorReadings[i] > pluckThresholds[i]) {
         noteOff(0, index2note(i), 100);
-        // if (i == curKeyIndex)
-        //   leds.setPixelColor(i, 50, 0, 0);
-        //   leds.show();
-
       } else if (currSensorReadings[i] > pluckThresholds[i] and prevSensorReadings[i] < pluckThresholds[i]) {
-        // leds.setPixelColor(i, 0, 100, 0);
         noteOn(0, index2note(i), 100);
-        // leds.show();
       }
-      // }
     }
+  
     printJackReading(curKeyIndex);
     printJackThreshold(curKeyIndex);
     Serial.println();
@@ -61,16 +57,14 @@ void debugLoop() {
   exitDebug();
 }
 
-void setCurrentKey() {
+void setCurrentKey(constexpr thresh) {
   for (int i = 0; i < numSensors; i++) {
-    // if (index2key(i) >= 20 and index2key(i) <= 30) {
-    // if (readSensor(i) < 500 and i != curKeyIndex) {
-    // curKeyIndex = i;
-    // leds.fill(leds.Color(0, 0, 0), 0, numSensors);
-    // leds.setPixelColor(curKeyIndex, 0, 0, 100);
-    // leds.show();
-    // }
-    // }
+    if (readSensor(i) < thresh and i != curKeyIndex) {
+      curKeyIndex = i;
+      leds.fill(leds.Color(0, 0, 0), 0, numSensors);
+      leds.setPixelColor(curKeyIndex, 0, 0, 100);
+      leds.show();
+    }
   }
 }
 

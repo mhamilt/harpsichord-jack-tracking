@@ -22,3 +22,8 @@ void setLedsToJackDisplacement() {
   }
   leds.show();
 }
+
+void rainbow(int step) {
+  leds.rainbow(step * 256);
+  leds.show();  // Update strip with new contents
+}

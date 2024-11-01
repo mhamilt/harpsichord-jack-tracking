@@ -121,6 +121,9 @@ JackState* tempStatePointer;
 // LED Variables
 const size_t ledPin = 9;
 Adafruit_NeoPixel leds(numSensors, ledPin, NEO_GRB + NEO_KHZ800);
+unsigned long now = 0;
+static int step = 0;
+
 //-----------------------------------------------------------------------------
 // Rotary Variables
 const byte ROTARY_PINC = 12;
@@ -177,7 +180,7 @@ void setup() {
 
   leds.begin();
   leds.clear();
-  // rainbow(10);
+  
   /// setup EEPROM
   if (!fram.begin())
     halt(FRAM_NOT_FOUND);
@@ -193,23 +196,27 @@ void setup() {
 }
 
 void loop() {
+
   readSensors();
+  rotary.loop();
+  button.loop();
+
+  for (int i = 0; i < numSensors; i++) {
+    if (currSensorReadings[i] < pluckThresholds[i] and prevSensorReadings[i] > pluckThresholds[i]) {
+      noteOff(0, index2note(i), 100);
+    } else if (currSensorReadings[i] > pluckThresholds[i] and prevSensorReadings[i] < pluckThresholds[i]) {
+      noteOn(0, index2note(i), 100);
+    }
+  }
+
   readCount++;
 
   if (readCount > 2048) {
     readCount = 0;
-    uint64_t now = millis();
-    Serial.println(now - lastRead);
-    lastRead = now;
+    Serial.println(millis() - lastRead);
+    lastRead = millis();
   }
 
-  updateJackStates();
-  setLedsToJackDisplacement();
-  // printReadings();
-  // checkJackStates();
-  // // printJackStates();
-  unsigned long now = millis();
-  static int step = 0;
   if (millis() - now > 10) {
     rainbow(step++);
     now = millis();
@@ -217,7 +224,6 @@ void loop() {
 }
 
 void calibrate() {
-
   static const int numReading = 8;
 
   for (int i = 0; i < numSensors; i++) {
@@ -227,8 +233,6 @@ void calibrate() {
       runningTotal += readSensor(i);
     }
     sensorAvgMaxima[i] = runningTotal /= numReading;
-    // leds.setPixelColor(i, leds.Color(0, 0, 100));
-    // leds.show();
   }
 }
 
@@ -242,10 +246,4 @@ constexpr byte key2index(byte k) {
   else if (k < 1)
     k = 1;
   return (numSensors - k);
-}
-
-// Rainbow cycle along whole strip. Pass delay time (in ms) between frames.
-void rainbow(int step) {
-  leds.rainbow(step * 256);
-  leds.show();  // Update strip with new contents
 }
