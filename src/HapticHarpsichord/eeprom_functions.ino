@@ -14,7 +14,7 @@ void readPluckFromEEPROM() {
     // fram.write(tagAddress, thresholdTag, 4);
     // fram.write(pluckValAddress, (uint8_t*)pluckThresholds, numSensors * 4);
   } else {
-    fram.read(pluckValAddress, (uint8_t*)pluckThresholds, numSensors * 4);
+    fram.read(pluckValAddress, (uint8_t*)pluckThresholds, numSensors * 2);
   }
 }
 

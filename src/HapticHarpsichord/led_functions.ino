@@ -27,3 +27,10 @@ void rainbow(int step) {
   leds.rainbow(step * 256);
   leds.show();  // Update strip with new contents
 }
+
+
+void breath(int step) {
+  leds.setBrightness(leds.sine8(step));
+  leds.fill(leds.Color(0xFF,0xFF,0XEE),0,numSensors);
+  leds.show();  // Update strip with new contents
+}

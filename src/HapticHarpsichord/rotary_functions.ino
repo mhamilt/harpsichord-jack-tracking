@@ -32,6 +32,7 @@ void doubleclick(Button2& btn) {
 
 
 void rotate(Rotary& r) {
+  // Serial.println(r.directionToString(r.getDirection()));
   if (isKeySelectMode) {
     curKeyIndex = r.getPosition();
     leds.fill(leds.Color(0, 0, 0), 0, numSensors);
