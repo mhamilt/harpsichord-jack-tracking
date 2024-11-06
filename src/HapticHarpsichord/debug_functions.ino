@@ -40,10 +40,12 @@ void debugLoop() {
       }
     }
 
-    // printJackReading(curKeyIndex);
-    // printJackThreshold(curKeyIndex);
-    // Serial.println();
+    printJackReading(curKeyIndex);
+    printJackThreshold(curKeyIndex);
+    Serial.println();
+
     readCount++;
+    
     if (readCount > 10) {
       readCount = 0;
       Serial.println(millis() - lastRead);
