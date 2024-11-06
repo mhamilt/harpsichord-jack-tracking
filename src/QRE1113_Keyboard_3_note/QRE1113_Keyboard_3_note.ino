@@ -4,11 +4,13 @@
 */
 //-----------------------------------------------------------------------------
 
-#include <MIDIUSB.h>
+// #include <MIDIUSB.h>
+#include <PluggableUSBMIDI.h>
 #include <Rotary.h>
 #include <Button2.h>
 #include <FlashStorage_SAMD.h>
 //-----------------------------------------------------------------------------
+USBMIDI MidiUSB;
 
 enum MIDI_EVENT_STATUS {
   NOTE_OFF = 0x8,
