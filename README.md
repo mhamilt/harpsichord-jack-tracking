@@ -15,6 +15,7 @@ This repository collects together all materials (CAD Drawings, diagrams, firmwar
     - [Jack Travel](#jack-travel)
     - [PCB](#pcb)
       - [7 Sensor Face Board](#7-sensor-face-board)
+        - [Notes](#notes)
         - [Eagle commands](#eagle-commands)
     - [Gradient Tag](#gradient-tag)
     - [Diagram](#diagram)
@@ -23,7 +24,7 @@ This repository collects together all materials (CAD Drawings, diagrams, firmwar
     - [Functionality](#functionality)
     - [Data sheets](#data-sheets)
     - [Multiplexing](#multiplexing)
-      - [1. Using 2 Micro contorllers](#1-using-2-micro-contorllers)
+      - [1. Using 2 Micro controllers](#1-using-2-micro-controllers)
   - [MIDI Specifications](#midi-specifications)
     - [Jack Differentiation](#jack-differentiation)
     - [Aftertouch](#aftertouch)
@@ -82,6 +83,10 @@ Face boards mount the QRE1113s perpendicular to the board so that there is no ne
 There are a couple of designs, at at present what is most important is the hole mounts at (`18.00mm`, `10.00mm`) and (`18.00mm`, `81.40mm`)
 
 
+##### Notes
+
+
+##### Eagle commands
 
 ```py
 ox = 1.71     # min distance from board edge
@@ -90,14 +95,12 @@ pitch = 14.02 # jack pitch
 [1.71, 15.73, 29.75, 43.77, 57.79, 71.80999999999999, 85.83]
 ```
 
-##### Eagle commands
-
 Python can be used to automatically generate the placement of all pieces.
 
 ```py
 qrepitch = 1.8 # placement is calculated from the #1 pin, pitch is used to offset to the centre
 ox = 1.71     # min distance from board edge
-oy = 1.71 # min distance from board edge in y axis
+oy = 1.71     # min distance from board edge in y axis
 pitch = 14.02 # jack pitch
 max_board_width = (6*pitch) + ox + qrepitch + ox
 
@@ -106,6 +109,10 @@ for index, point in enumerate([(x * pitch) + ox for x in range(0,7)]):
   # print(f"rotate Q{index+1};")
 for index, point in enumerate([(x * pitch) + ox for x in range(0,16)]):
   print(f"move Q{index+1} ({oy} {point});")
+
+# Ideal LED placement
+for index, point in enumerate([(x * pitch) + ox for x in range(0,7)]):
+  print(f"move D{index+1} ({23.8} {point+qrepitch/2});")
 
 resitor10k_ox = 10.1 # min distance from board edge in y axis
 resitor10k_oy = 7.0 # min distance from board edge in y axis
@@ -249,18 +256,24 @@ Solutions:
       - 7 multiplexers for groups of seven boards
       - 3 more digital pins for control 
 
-#### 1. Using 2 Micro contorllers
+#### 1. Using 2 Micro controllers
 
 - Each sensor board needs 8 pins
-  1. VCC
-  2. Signal
-  3. Addr1: A
-  4. Addr2: B
-  5. Addr3: C
-  6. Interrupt
-  7. GND
-  8. VEE
-- 
+  
+  1. GND 
+  2. VCC/VDD 5V
+  3. VDD 3V
+  4. Mux Address A
+  5. Mux Address B
+  6. Mux Address C
+  7. LED Data
+  8.  Signal 1
+  9.  Signal 2
+  10. Signal 3
+  11. Signal 4
+  12. Signal 5
+  13. Signal 6
+  14. Signal 7
 
 
 ## MIDI Specifications
